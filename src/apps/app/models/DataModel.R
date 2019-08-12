@@ -21,7 +21,7 @@ DataModel = R6Class(
         initialize = function(rda_file = "data/data.rda"){
             load(rda_file)
             self$raw_data = data
-            self$fix_mislabel()
+            #self$fix_mislabel()
         },
         
         fix_mislabel = function(){
