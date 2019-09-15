@@ -38,7 +38,11 @@ ProteinScoresPage = R6Class(
         server = function(input, output, session){
             output$table = renderDT({
                 datatable(
-                    DATA$get_protein_scores(input$id),
+                    DATA$get_protein_scores(input$id) %>%
+                        mutate(
+                            uniprot_id = glue::glue('<a href="https://www.uniprot.org/uniprot/{uniprot_id}" target="_blank">{uniprot_id}</a>')
+                        ),
+                    escape = FALSE,
                     options = list(
                         pageLength = 50,
                         lengthMenu = c(25, 50, 100, 500)

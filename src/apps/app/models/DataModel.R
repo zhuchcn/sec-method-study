@@ -13,6 +13,7 @@ DataModel = R6Class(
             n_aa = 0,
             exclude = character()
         ),
+        density = "210",
         
         xic = data.frame(),
         uniprot_ids = NULL,
@@ -20,39 +21,29 @@ DataModel = R6Class(
         # initializer
         initialize = function(rda_file = "data/data.rda"){
             load(rda_file)
+            data$xic = data$xic[[self$density]]
             self$raw_data = data
-            #self$fix_mislabel()
-        },
-        
-        fix_mislabel = function(){
-            temp = self$raw_data$xic[,"F3"]
-            self$raw_data$xic[,"F3"] = self$raw_data$xic[,"F4"]
-            self$raw_data$xic[,"F4"] = temp
-            
-            temp = self$raw_data$RT[,"F3"]
-            self$raw_data$RT[,"F3"] = self$raw_data$RT[,"F4"]
-            self$raw_data$RT[,"F4"] = temp
-            
-            temp = self$raw_data$bionic[["F3"]]
-            self$raw_data$bionic[["F3"]] = self$raw_data$bionic[["F4"]]
-            self$raw_data$bionic[["F4"]] = temp
         },
         
         update = function(n_peptides = 2, n_spectra = 0, exclude = character(), 
                           log_prob = 0, best_log_prob = 0, best_score = 0,
                           coverage = 0, n_aa = 0){
-            self$param = list(
-                n_peptides = n_peptides,
-                n_spectra = n_spectra,
-                exclude = exclude,
-                log_prob = log_prob,
-                best_log_prob = best_log_prob,
-                best_score = best_score,
-                coverage = coverage,
-                n_aa = n_aa
-            )
+            self$param$n_peptides = n_peptides
+            self$param$n_peptides = n_peptides
+            self$param$n_spectra = n_spectra
+            self$param$exclude = exclude
+            self$param$log_prob = log_prob
+            self$param$best_log_prob = best_log_prob
+            self$param$best_score = best_score
+            self$param$coverage = coverage
+            self$param$n_aa = n_aa
             self$update_uniq_protein_id()
             self$update_xic()
+        },
+        
+        update_density = function(density){
+            self$density = density
+            self$initialize()
         },
         
         update_uniq_protein_id = function(){
@@ -85,13 +76,13 @@ DataModel = R6Class(
                 xic2 =  xic2 %>%
                     mutate(
                         sample_coverage = apply(
-                            xic2[, paste0("F", 0:8)], 1,
+                            xic2[, paste0("F", 0:7)], 1,
                             function(row) sum(!is.na(row))
                         )
                     ) %>%
                     filter(sample_coverage == max(sample_coverage, na.rm = TRUE)) 
                 xic2 = xic2 %>%
-                    mutate(mean = rowMeans(xic2[,paste0("F", 0:8)], na.rm = TRUE)) %>%
+                    mutate(mean = rowMeans(xic2[,paste0("F", 0:7)], na.rm = TRUE)) %>%
                     filter(mean == max(mean, na.rm = TRUE)) %>%
                     select(-mean)
                 return(xic2)
@@ -105,7 +96,7 @@ DataModel = R6Class(
         },
         
         get_xic_table = function(){
-            return(self$xic[,c("uniprot_id", "short_name", "long_name", "sequence", "charge", paste0("F", 0:8))])
+            return(self$xic[,c("uniprot_id", "short_name", "long_name", "sequence", "charge", paste0("F", 0:7))])
         },
         
         get_protein_scores = function(id){
@@ -120,7 +111,7 @@ DataModel = R6Class(
                 stop("param not valid")
             
             table = self$xic
-            for(f in paste0("F", 0:8)){
+            for(f in paste0("F", 0:7)){
                 proteins = self$raw_data$byonic[[f]]$proteins %>%
                     column_to_rownames("uniprot_id")
                 table[,f] = proteins[as.character(table$uniprot_id), param]
@@ -130,8 +121,8 @@ DataModel = R6Class(
         
         protein_bar_plot = function(index){
             data.frame(
-                value = as.numeric(self$xic[index, paste0("F", 0:8)]),
-                fraction = paste0("F", 0:8)
+                value = as.numeric(self$xic[index, paste0("F", 0:7)]),
+                fraction = paste0("F", 0:7)
             ) %>%
                 ggplot() +
                 geom_col(aes(x = fraction, y = value), fill = "steelblue") +
@@ -158,7 +149,7 @@ DataModel = R6Class(
         },
         
         proteins_bar_plot = function(percentage = TRUE){
-            df = self$xic[,paste0("F", 0:8)]
+            df = self$xic[,paste0("F", 0:7)]
             if(percentage){
                 df = sapply(df, function(col){
                     col/sum(col, na.rm = TRUE)
@@ -174,7 +165,7 @@ DataModel = R6Class(
         },
         
         pie_plot = function(fraction){
-            if(!(fraction %in% paste0("F", 0:8))) {
+            if(!(fraction %in% paste0("F", 0:7))) {
                 stop("not valid fraction")
             }
             data.frame(

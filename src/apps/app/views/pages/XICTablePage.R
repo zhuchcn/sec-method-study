@@ -55,7 +55,11 @@ XICTablePage = R6Class(
             
             output$table = renderDT({
                 datatable(
-                    self$data$table,
+                    self$data$table %>%
+                        mutate(
+                            long_name = glue::glue('<a href="https://www.uniprot.org/uniprot/{uniprot_id}" target="_blank">{long_name}</a>')
+                        ),
+                    escape = FALSE,
                     options = list(
                         pageLength = 25,
                         lengthMenu = c(10, 25, 50, 100, 500)
@@ -65,7 +69,7 @@ XICTablePage = R6Class(
                         selected = "1"
                     )
                 ) %>%
-                    formatSignif(paste0("F", 0:8), digits = 3)
+                    formatSignif(paste0("F", 0:7), digits = 3)
             })
             
             output$plot = renderPlotly({
@@ -75,8 +79,8 @@ XICTablePage = R6Class(
         
         plot = function(index){
             data.frame(
-                value = as.numeric(self$data$table[index, paste0("F", 0:8)]),
-                fraction = paste0("F", 0:8)
+                value = as.numeric(self$data$table[index, paste0("F", 0:7)]),
+                fraction = paste0("F", 0:7)
             ) %>%
                 ggplot() +
                 geom_col(aes(x = fraction, y = value), fill = "steelblue") +

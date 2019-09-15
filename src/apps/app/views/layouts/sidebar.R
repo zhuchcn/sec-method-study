@@ -12,7 +12,8 @@ Sidebar = R6Class(
             best_score = 0,
             coverage = 0,
             n_aa = 0,
-            exclude = character()
+            exclude = character(),
+            density = "210"
         ),
         
         # initializer
@@ -25,6 +26,13 @@ Sidebar = R6Class(
             ns = NS(self$id)
             dashboardSidebar(
                 sidebarMenu(
+                    radioButtons(
+                        "density",
+                        "density",
+                        choices = c("210", "250"),
+                        selected = "210",
+                        inline = TRUE
+                    ),
                     numericInput(
                         "n_peptides",
                         "Minimal # of unique peptides",
@@ -38,17 +46,17 @@ Sidebar = R6Class(
                     numericInput(
                         "log_prob",
                         "Minimal |Log Prob|",
-                        min = 0, max = 100, step = 0.01, value = 0
+                        min = 0, max = 100, step = 0.01, value = 4.6
                     ),
                     numericInput(
                         "best_log_prob",
                         "Minimal Best |Log Prob|",
-                        min = 0, max = 100, step = 0.01, value = 0
+                        min = 0, max = 100, step = 0.01, value = 6.9
                     ),
                     numericInput(
                         "best_score",
-                        "Minimal Best",
-                        min = 0, max = 1000, step = 0.1, value = 0
+                        "Minimal Best Score",
+                        min = 0, max = 1000, step = 0.1, value = 400
                     ),
                     numericInput(
                         "coverage",
@@ -64,7 +72,10 @@ Sidebar = R6Class(
                         "exclude",
                         "Manully exclude:",
                         choices = DATA$get_all_protein_short_names(),
-                        selected = c("SHRM3", "TY1", "CRNS1"),
+                        selected = c(
+                            "SHRM3", "TRY1", "TRY3", "TRY6", "K2C1", "K1C9",
+                            "K1C10", "K1C14", "K22E", "K2C5", "K2C6B", "K2C1B"
+                        ),
                         multiple = TRUE
                     ),
                     menuItem("XIC Table", tabName = "xic"),
@@ -76,6 +87,10 @@ Sidebar = R6Class(
         
         # server
         server = function(input, output, session){
+            observeEvent(input$density, {
+                self$data$density = input$density
+                self$update()
+            })
             observeEvent(input$n_peptides, {
                 self$data$n_peptides = input$n_peptides
                 self$update()

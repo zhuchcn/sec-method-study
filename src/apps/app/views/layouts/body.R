@@ -34,6 +34,9 @@ Body = R6Class(
         # server
         server = function(input, output, session, props){
             observeEvent(props$update, {
+                observeEvent(props$density, {
+                    DATA$update_density(props$density)
+                })
                 DATA$update(
                     n_peptides = props$n_peptides, 
                     n_spectra = props$n_spectra, 

@@ -66,13 +66,7 @@ FiguresPage = R6Class(
             output$pie5 = renderPlotly({DATA$pie_plot("F5")})
             output$pie6 = renderPlotly({DATA$pie_plot("F6")})
             output$pie7 = renderPlotly({DATA$pie_plot("F7")})
-            output$pie8 = renderPlotly({DATA$pie_plot("F8")})
 
-            # for(i in 0:8){
-            #     output[[paste0("pie", i)]] = renderPlotly({
-            #         DATA$pie_plot(paste0("F", i))
-            #     })
-            # }
         }
     )
 )

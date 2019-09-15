@@ -6,19 +6,22 @@ for(pkg in pkgs){
 setwd(dirname(parent.frame(2)$ofile))
 
 ## xic
-file = "../../../../data-raw/xic.csv"
-xic = read.csv(file, header = FALSE, skip = 3)
+file = "../../../../data-raw/20190830/20190830 HDL shotgun proteomics summary.xlsx"
+xic = read_excel(file, sheet = "area", col_names = FALSE, skip = 3)
 colnames(xic) = c(
-    "protein", "peptide_label", "sequence", "charge", "ms_alias",
-    paste0("F", 0:8)
+    "protein", "peptide_label", "sequence", "charge", "Mod_AAs", "ms_alias",
+    paste0("F-", 0:7, "-210"), paste0("F-", 0:7, "-250")
 )
 
-## RT
-file = "../../../../data-raw/RT.csv"
-RT = read.csv(file, header = FALSE, skip = 3)
-colnames(RT) = c(
-    "protein", "peptide_label", "sequence", "charge", "ms_alias",
-    paste0("F", 0:8)
+xic_210 = xic[,c(1:14)] %>% as.data.frame()
+colnames(xic_210)[7:14] = paste0("F", 0:7)
+
+xic_250 = xic[,c(1:6, 15:22)] %>% as.data.frame()
+colnames(xic_250)[7:14] = paste0("F", 0:7)
+
+xic = list(
+    "210" = xic_210,
+    "250" = xic_250
 )
 
 split_protein_name = function(names){
@@ -41,18 +44,16 @@ split_protein_name = function(names){
 }
 
 
-xic = cbind(
-    split_protein_name(xic$protein),
-    xic[,-1]
-)
-
-RT = cbind(
-    split_protein_name(RT$protein),
-    RT[,-1]
-)
+xic = lapply(xic, function(table){
+    cbind(
+        split_protein_name(table$protein),
+        table[,-1]
+    )
+})
 
 ## Byonic outputs
-files = list.files("../../../../data-raw/", pattern = "^HDL-fraction[0-8].raw.xlsx$", 
+files = list.files("../../../../data-raw/20190830/byonic shotgun proteomics 20190830", 
+                   pattern = "^HDL-fraction[0-7]-210.raw.xlsx$", 
                    full.names = TRUE)
 
 split_protein_name2 = function(names){
@@ -88,11 +89,10 @@ byonic = lapply(files, function(file){
     )
     return(list(spectra = spectra, proteins = proteins))
 })
-names(byonic) = paste0("F", 0:8)
+names(byonic) = paste0("F", 0:7)
 
 data = list(
     xic = xic,
-    RT = RT,
     byonic = byonic
 )
 
