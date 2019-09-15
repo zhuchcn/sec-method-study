@@ -52,9 +52,11 @@ xic = lapply(xic, function(table){
 })
 
 ## Byonic outputs
-files = list.files("../../../../data-raw/20190830/byonic shotgun proteomics 20190830", 
-                   pattern = "^HDL-fraction[0-7]-210.raw.xlsx$", 
-                   full.names = TRUE)
+files = lapply(c("210", "250"), function(density){
+    list.files("../../../../data-raw/20190830/byonic shotgun proteomics 20190830", 
+               pattern = glue::glue("^HDL-fraction[0-7]-{density}.raw.xlsx$"), 
+               full.names = TRUE)
+}) %>% `names<-`(c("210", "250"))
 
 split_protein_name2 = function(names){
     fdata = lapply(names, function(name){
@@ -74,22 +76,25 @@ split_protein_name2 = function(names){
     fdata = do.call(rbind, fdata)
 }
 
-byonic = lapply(files, function(file){
-    spectra = read_excel(file, sheet = "Spectra")
-    colnames(spectra) = gsub("\n", " ", colnames(spectra))
-    spectra = cbind(
-        split_protein_name2(spectra$`Protein Name`),
-        spectra[,colnames(spectra) != "Protein Name"]
-    )
-    proteins = read_excel(file, sheet = "Proteins")
-    colnames(proteins) = gsub("\n", " ", colnames(proteins))
-    proteins = cbind(
-        split_protein_name2(proteins$Description),
-        proteins[,colnames(proteins) != "Description"]
-    )
-    return(list(spectra = spectra, proteins = proteins))
-})
-names(byonic) = paste0("F", 0:7)
+byonic = lapply(files, function(density){
+    lapply(density, function(file){
+        spectra = read_excel(file, sheet = "Spectra")
+        colnames(spectra) = gsub("\n", " ", colnames(spectra))
+        spectra = cbind(
+            split_protein_name2(spectra$`Protein Name`),
+            spectra[,colnames(spectra) != "Protein Name"]
+        )
+        proteins = read_excel(file, sheet = "Proteins")
+        colnames(proteins) = gsub("\n", " ", colnames(proteins))
+        proteins = cbind(
+            split_protein_name2(proteins$Description),
+            proteins[,colnames(proteins) != "Description"]
+        )
+        return(list(spectra = spectra, proteins = proteins))
+    }) %>%
+        `names<-`(paste0("F", 0:7))
+}) %>%
+    `names<-`(c("210", "250"))
 
 data = list(
     xic = xic,

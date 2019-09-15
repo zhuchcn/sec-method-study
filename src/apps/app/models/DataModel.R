@@ -22,6 +22,7 @@ DataModel = R6Class(
         initialize = function(rda_file = "data/data.rda"){
             load(rda_file)
             data$xic = data$xic[[self$density]]
+            data$byonic = data$byonic[[self$density]]
             self$raw_data = data
         },
         
