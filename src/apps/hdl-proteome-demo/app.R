@@ -13,16 +13,16 @@ ui = fluidPage(
     fluidRow(
         column(
             width = 6,
-            DTOutput("table")
-        ),
-        column(
-            width = 6,
             selectInput(
                 "fraction",
                 "Fraction",
                 choices = fraction_names,
                 selected = "small HDL"
             ),
+            DTOutput("table")
+        ),
+        column(
+            width = 6,
             plotlyOutput("pieplot")
         )
     ),
@@ -37,13 +37,16 @@ server = function(input, output, session){
             value = as.numeric(data$xic[protein_to_plot, fraction_names])
         ) %>%
             ggplot(aes(x = fraction, y = value)) +
-            geom_col(aes(fill = fraction == input$fraction)) +
-            scale_fill_manual(values = c("gray10", "red")) +
+            geom_col(aes(fill = fraction == input$fraction), width = 0.75) +
+            scale_fill_manual(values = c("gray30", "firebrick1")) +
             theme_bw() +
             labs(y = "XIC", title = as.character(data$xic$long_name[protein_to_plot])) +
             theme(
                 axis.title.x = element_blank(),
+                axis.text = element_text(color = "black"),
+                axis.ticks = element_line(color = "black"),
                 panel.grid = element_blank(),
+                panel.border = element_rect(color = "black"),
                 legend.position = "none"
             )
     })
