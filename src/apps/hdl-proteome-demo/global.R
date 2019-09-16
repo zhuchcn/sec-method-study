@@ -5,4 +5,5 @@ for(pkg in pkgs){
 
 load("data/data.rda")
 
-fraction_names = c("LDL", "large HDL", "medium HDL", "small HDL", "pre-beta HDL", "Plasma Proteins") 
+# fraction_names = c("LDL", "large HDL", "medium HDL", "small HDL", "pre-beta HDL", "Plasma Proteins") 
+fraction_names = paste0("F", 1:7) 

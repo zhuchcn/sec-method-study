@@ -17,7 +17,7 @@ ui = fluidPage(
                 "fraction",
                 "Fraction",
                 choices = fraction_names,
-                selected = "small HDL"
+                selected = "F5"
             ),
             DTOutput("table")
         ),

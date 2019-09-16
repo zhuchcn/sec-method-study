@@ -148,10 +148,10 @@ data = list(
     byonic = byonic[["210"]]
 )
 
-data$xic = select(data$xic, -c(F0, F1))
-colnames(data$xic)[14:19] = c("LDL", "large HDL", "medium HDL", "small HDL", "pre-beta HDL", "Plasma Proteins")
+data$xic = select(data$xic, -F0)
+# colnames(data$xic)[14:19] = c("LDL", "large HDL", "medium HDL", "small HDL", "pre-beta HDL", "Plasma Proteins")
 
-data$byonic = data$byonic[3:8]
-names(data$byonic) = c("LDL", "large HDL", "medium HDL", "small HDL", "pre-beta HDL", "Plasma Proteins")
+data$byonic = data$byonic[2:8]
+# names(data$byonic) = c("LDL", "large HDL", "medium HDL", "small HDL", "pre-beta HDL", "Plasma Proteins")
 
 save(data, file = "data.rda")
