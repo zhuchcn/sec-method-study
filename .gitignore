@@ -1,4 +1,8 @@
 .Rproj.user
 .Rhistory
-data-raw
+!data-raw
+data-raw/*
+!data-raw/20190830/
 .DS_Store
+*.ipynb
+.ipynb_checkpoints
